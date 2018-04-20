@@ -1,6 +1,8 @@
 #include <mbed.h>
 
 #define NUM_STATES 3
+#define PHOTORESISTOR_TARGET_VOLTAGE 2.7
+#define ADC_FACTOR 1241.2121
 
 // ========== Pin Assignments ==========
 // Inputs
@@ -16,15 +18,14 @@
 // ========= Pin Configuration =========
 // Inputs
 // DigitalIn  marble_switch(SWITCH_PIN);
-// AnalogIn   photoresistor(PHOTORESISTOR_PIN);
+AnalogIn   photoresistor(PHOTORESISTOR_PIN);
 // AnalogIn   microphone   (MICROPHONE_PIN);
 
 // Outputs
-// PwmOut     motor        (MOTOR_PIN);
-DigitalOut     motor        (MOTOR_PIN);
+DigitalOut motor        (MOTOR_PIN);
 DigitalOut led          (LED_PIN);
 DigitalOut test_led     (LED1);
-// PwmOut     speaker      (SPEAKER_PIN);
+DigitalOut speaker      (SPEAKER_PIN);
 
 // =========== State Machine ===========
 typedef enum {
@@ -73,8 +74,14 @@ int main() {
  */
 void
 State_Inputting(void) {
-  led = 0;   // Turn off LED
-  wait(1.0); // Wait 200ms
+  led = 0;     // Turn off LED
+  speaker = 0; // Turn off buzzer
+  // wait(1.0); // Wait 200ms
+
+  // Polls until photoresistor is at target voltage
+  while (photoresistor.read_u16() < PHOTORESISTOR_TARGET_VOLTAGE * ADC_FACTOR) {
+    continue;
+  }
 
   current_state = ENABLED;
 }
@@ -96,7 +103,8 @@ State_Enabled(void) {
  */
 void
 State_Outputting(void) {
-  led = 1;   // Turn on LED
+  led = 1;     // Turn on LED
+  speaker = 1; // Turn on buzzer
   test_led = 0;
   motor = 0;
   wait(1.0); // Wait 200ms
