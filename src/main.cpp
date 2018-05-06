@@ -1,7 +1,7 @@
 #include <mbed.h>
 
 #define NUM_STATES 3
-#define PHOTORESISTOR_TARGET_VOLTAGE 2.7
+#define PHOTORESISTOR_TARGET_VOLTAGE 2.5
 #define ADC_FACTOR 1241.2121
 
 // ========== Pin Assignments ==========
@@ -13,11 +13,11 @@
 // Outputs
 #define MOTOR_PIN         D6
 #define LED_PIN           D5
-#define SPEAKER_PIN       D7
+#define SPEAKER_PIN       D4
 
 // ========= Pin Configuration =========
 // Inputs
-// DigitalIn  marble_switch(SWITCH_PIN);
+DigitalIn  marble_switch(SWITCH_PIN);
 AnalogIn   photoresistor(PHOTORESISTOR_PIN);
 // AnalogIn   microphone   (MICROPHONE_PIN);
 
@@ -78,7 +78,7 @@ State_Inputting(void) {
   speaker = 0; // Turn off buzzer
   // wait(1.0); // Wait 200ms
 
-  // Polls until photoresistor is at target voltage
+  //Polls until photoresistor is at target voltage
   while (photoresistor.read_u16() < PHOTORESISTOR_TARGET_VOLTAGE * ADC_FACTOR) {
     continue;
   }
@@ -93,7 +93,11 @@ void
 State_Enabled(void) {
   test_led = 1;
   motor = 1;
-  wait(1.0); // Wait 200ms
+  // wait(1.0); // Wait 200ms
+
+  while (marble_switch.read()) {
+      continue;
+  }
 
   current_state = OUTPUTTING;
 }
