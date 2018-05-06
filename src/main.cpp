@@ -1,13 +1,16 @@
 #include <mbed.h>
 
-#define NUM_STATES 3
+#define NUM_STATES                   3
 #define PHOTORESISTOR_TARGET_VOLTAGE 2.5
-#define ADC_FACTOR 1241.2121
+#define MICROPHONE_TARGET_VOLTAGE    0.9
+#define POTENTIOMETER_TARGET_VOLTAGE 3.1
+#define ADC_FACTOR                   1241.2121
 
 // ========== Pin Assignments ==========
 // Inputs
 #define PHOTORESISTOR_PIN A1
 #define MICROPHONE_PIN    A2
+#define POTENTIOMETER_PIN A3
 #define SWITCH_PIN        D9
 
 // Outputs
@@ -19,7 +22,8 @@
 // Inputs
 DigitalIn  marble_switch(SWITCH_PIN);
 AnalogIn   photoresistor(PHOTORESISTOR_PIN);
-// AnalogIn   microphone   (MICROPHONE_PIN);
+AnalogIn   microphone   (MICROPHONE_PIN);
+AnalogIn   potentiometer(POTENTIOMETER_PIN);
 
 // Outputs
 DigitalOut motor        (MOTOR_PIN);
@@ -79,7 +83,7 @@ State_Inputting(void) {
   // wait(1.0); // Wait 200ms
 
   //Polls until photoresistor is at target voltage
-  while (photoresistor.read_u16() < PHOTORESISTOR_TARGET_VOLTAGE * ADC_FACTOR) {
+  while (has_light() && has_sound()) {
     continue;
   }
 
@@ -96,7 +100,9 @@ State_Enabled(void) {
   // wait(1.0); // Wait 200ms
 
   while (marble_switch.read()) {
-      continue;
+      if (potentiometer.read_u16() >= POTENTIOMETER_TARGET_VOLTAGE * ADC_FACTOR) {
+          motor = 0;
+      }
   }
 
   current_state = OUTPUTTING;
@@ -114,4 +120,14 @@ State_Outputting(void) {
   wait(1.0); // Wait 200ms
 
   current_state = INPUTTING;
+}
+
+int
+has_light(void) {
+    return photoresistor.read_u16() < PHOTORESISTOR_TARGET_VOLTAGE * ADC_FACTOR;
+}
+
+int
+has_sound(void) {
+    return microphone.read_u16() < MICROPHONE_TARGET_VOLTAGE * ADC_FACTOR;
 }
