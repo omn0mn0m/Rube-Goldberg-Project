@@ -83,7 +83,7 @@ State_Inputting(void) {
   // wait(1.0); // Wait 200ms
 
   //Polls until photoresistor is at target voltage
-  while (has_light() && has_sound()) {
+  while (!has_light() && !has_sound()) {
     continue;
   }
 
@@ -116,18 +116,28 @@ State_Outputting(void) {
   led = 1;     // Turn on LED
   speaker = 1; // Turn on buzzer
   test_led = 0;
-  motor = 0;
+  motor = 0;    // Turns off the motor in case it wasn't off already
   wait(1.0); // Wait 200ms
 
   current_state = INPUTTING;
 }
 
+/**
+ * Checks if there is a light
+ *
+ * @return If the photoresistor has picked up the trigger light
+ */
 int
 has_light(void) {
-    return photoresistor.read_u16() < PHOTORESISTOR_TARGET_VOLTAGE * ADC_FACTOR;
+    return photoresistor.read_u16() >= PHOTORESISTOR_TARGET_VOLTAGE * ADC_FACTOR;
 }
 
+/**
+ * Checks if there is a sound
+ *
+ * @return If the microphone has picked up the trigger sound
+ */
 int
 has_sound(void) {
-    return microphone.read_u16() < MICROPHONE_TARGET_VOLTAGE * ADC_FACTOR;
+    return microphone.read_u16() >= MICROPHONE_TARGET_VOLTAGE * ADC_FACTOR;
 }
