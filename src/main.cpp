@@ -2,14 +2,15 @@
 
 #define NUM_STATES                   3
 #define PHOTORESISTOR_TARGET_VOLTAGE 2.5
-#define MICROPHONE_TARGET_VOLTAGE    0.9
+#define MICROPHONE_TARGET_VOLTAGE    3.0
 #define POTENTIOMETER_TARGET_VOLTAGE 3.1
 #define ADC_FACTOR                   1241.2121
 
 // ========== Pin Assignments ==========
 // Inputs
 #define PHOTORESISTOR_PIN A1
-#define MICROPHONE_PIN    A2
+//#define MICROPHONE_PIN    A2
+#define MICROPHONE_PIN    D7
 #define POTENTIOMETER_PIN A3
 #define SWITCH_PIN        D9
 
@@ -22,7 +23,8 @@
 // Inputs
 DigitalIn  marble_switch(SWITCH_PIN);
 AnalogIn   photoresistor(PHOTORESISTOR_PIN);
-AnalogIn   microphone   (MICROPHONE_PIN);
+//AnalogIn   microphone   (MICROPHONE_PIN);
+DigitalIn  microphone   (MICROPHONE_PIN);
 AnalogIn   potentiometer(POTENTIOMETER_PIN);
 
 // Outputs
@@ -55,6 +57,9 @@ State_t state_machine[] = {
 
 StateName_t current_state = INPUTTING;
 
+int has_sound(void);
+int has_light(void);
+
 // ====================================
 
 int main() {
@@ -84,6 +89,8 @@ State_Inputting(void) {
 
   //Polls until photoresistor is at target voltage
   while (!has_light() && !has_sound()) {
+  //while (!has_sound()) {
+  //while (!has_light()) {
     continue;
   }
 
@@ -119,6 +126,11 @@ State_Outputting(void) {
   motor = 0;    // Turns off the motor in case it wasn't off already
   wait(1.0); // Wait 200ms
 
+  led = 0;     // Turn off LED
+  speaker = 0; // Turn off buzzer
+
+  wait(10.0);
+
   current_state = INPUTTING;
 }
 
@@ -139,5 +151,6 @@ has_light(void) {
  */
 int
 has_sound(void) {
-    return microphone.read_u16() >= MICROPHONE_TARGET_VOLTAGE * ADC_FACTOR;
+    //return microphone.read_u16() >= MICROPHONE_TARGET_VOLTAGE * ADC_FACTOR;
+    return microphone.read();
 }
