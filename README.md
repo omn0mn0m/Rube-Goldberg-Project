@@ -1,4 +1,4 @@
 # Rube-Goldberg-Project
-[![Build Status](https://travis-ci.org/omn0mn0m/Rube-Goldberg-Project.svg?branch=master)](https://travis-ci.org/omn0mn0m/Rube-Goldberg-Project)
+![Build Status](https://github.com/omn0mn0m/Rube-Goldberg-Project/workflows/Rube%20Goldberg%20Project/badge.svg)
 
 Final project for Capstone Prep course
